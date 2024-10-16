@@ -20,7 +20,7 @@ public class AttractionService {
         return touristRepository.getAllAttractions();
     }
 
-    public Attraction getAttractionbyName(String name) {
+    public List<Attraction> getAttractionbyName(String name) {
         return touristRepository.getAttractionByName(name);
     }
 
