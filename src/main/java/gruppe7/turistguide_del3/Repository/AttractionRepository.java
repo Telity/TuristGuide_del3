@@ -13,18 +13,18 @@ import java.util.List;
 
 @Repository
 public class AttractionRepository {
-@Value("${spring.datasource.url}")
-private String url;
-@Value("${spring.datasource.username}")
-private String username;
-@Value("${spring.datasource.password}")
-private String password;
+    @Value("${spring.datasource.url}")
+    private String url;
+    @Value("${spring.datasource.username}")
+    private String username;
+    @Value("${spring.datasource.password}")
+    private String password;
 
-    public List<Attraction> getAllAttractions () {
+    public List<Attraction> getAllAttractions() {
         List<Attraction> attractions = new ArrayList<>();
 
-        String query = "SELECT * FROM attractions";
-        try(Connection con = DriverManager.getConnection(url, username, password)){
+        String query = "SELECT * FROM ATTRACTION";
+        try (Connection con = DriverManager.getConnection(url, username, password)) {
             Statement statement = con.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
 
@@ -38,21 +38,63 @@ private String password;
                 attractions.add(attraction);
             }
 
-        }catch(SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
         return attractions;
     }
 
+    public List<String> getTagsList(){
+        List<String> tags = new ArrayList<>();
+
+        String query = "SELECT * FROM TAG";
+
+        try(Connection con = DriverManager.getConnection(url, username, password)){
+            Statement statement = con.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+
+            while(resultSet.next()){
+                tags.add(resultSet.getString("tag_name"));
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return tags;
+
+    }
+
+    public List<String> getTownList(){
+
+        List<String> towns = new ArrayList<>();
+
+        String query = "SELECT * FROM CITY";
+
+        try(Connection con = DriverManager.getConnection(url, username, password)){
+            Statement statement = con.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+
+            while(resultSet.next()){
+                towns.add(resultSet.getString("city_name"));
+            }
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return towns;
+
+    }
 
     public List<Attraction> getAttractionByName(String name) {
 
         List<Attraction> attractions = new ArrayList<>();
 
-        String query = "SELECT * FROM attractions WHERE name = ?";
+        String query = "SELECT * FROM ATTRACTION WHERE name = ?";
 
-        try(Connection con = DriverManager.getConnection(url, username, password)) {
+        try (Connection con = DriverManager.getConnection(url, username, password)) {
             PreparedStatement statement = con.prepareStatement(query);
 
             statement.setString(1, name);
@@ -82,7 +124,7 @@ private String password;
         String query = "SELECT T.name FROM TAG T " + "JOIN ATTRACTION_TAG AT ON T.tag_id = AT.tag_id " +
                 "JOIN ATTRACTION A ON A.attraction_id = AT.attraction_id " + "WHERE A.name = ?";
 
-        try(Connection con = DriverManager.getConnection(url, username, password)) {
+        try (Connection con = DriverManager.getConnection(url, username, password)) {
             PreparedStatement statement = con.prepareStatement(query);
 
             statement.setString(1, name);
@@ -92,7 +134,7 @@ private String password;
                 tags.add(resultSet.getString("name"));
             }
 
-        }catch (SQLException e){
+        } catch (SQLException e) {
             e.printStackTrace();
         }
 
@@ -101,39 +143,44 @@ private String password;
     }
 
 
-    public int addAttraction(Attraction attraction) {
-
-        int updatedRows = 0;
+    public Attraction addAttraction(Attraction attraction) {
 
         String query = "INSERT INTO ATTRACTION (name, description, fee, city_id) VALUES (?, ?, ?, ?)";
 
-        try(Connection con = DriverManager.getConnection(url, username, password)){
-            PreparedStatement statement = con.prepareStatement(query);
+        try (Connection con = DriverManager.getConnection(url, username, password)) {
+            PreparedStatement statement = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
 
             statement.setString(1, attraction.getName());
             statement.setString(2, attraction.getDescription());
             statement.setInt(3, attraction.getFee());
             statement.setInt(4, attraction.getCityID());
 
-            updatedRows = statement.executeUpdate();
+            int updatedRows = statement.executeUpdate();
+
+            if(updatedRows > 0){
+                ResultSet result = statement.getGeneratedKeys(); // get the generated key
+                if(result.next()){
+                    int generatedId = result.getInt(1);
+                    attraction.setId(generatedId);
+                }
+            }
 
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
-        return updatedRows;
-
+        return attraction;
     }
 
-    public int deleteAttraction(int attractionId) {
+    public int deleteAttraction(String name) {
         int updatedRows = 0;
 
-        String query = "DELETE FROM ATTRACTION WHERE attraction_id = ?";
+        String query = "DELETE FROM ATTRACTION WHERE name = ?";
 
-        try(Connection con = DriverManager.getConnection(url, username, password){
+        try (Connection con = DriverManager.getConnection(url, username, password)) {
             PreparedStatement statement = con.prepareStatement(query);
 
-            statement.setInt(1, attractionId);
+            statement.setString(1, name);
 
             updatedRows = statement.executeUpdate();
 
@@ -151,7 +198,7 @@ private String password;
 
         String query = "UPDATE ATTRACTION SET name = ?, description = ?, fee = ?, city_id = ? WHERE attraction_id = ? ";
 
-        try(Connection con = DriverManager.getConnection(url, username, password)){
+        try (Connection con = DriverManager.getConnection(url, username, password)) {
             PreparedStatement statement = con.prepareStatement(query);
 
             statement.setString(1, attraction.getName());
@@ -168,10 +215,10 @@ private String password;
 
         return updatedRows;
     }
+}
 
-    public List<Attraction> addAttractionList(Attraction attraction) {
+    /* public List<Attraction> addAttractionList(Attraction attraction) {
         attractions.add(attraction);
         return attractions;
     }
-
-}
+     */
