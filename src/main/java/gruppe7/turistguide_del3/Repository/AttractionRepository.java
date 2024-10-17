@@ -1,106 +1,172 @@
 package gruppe7.turistguide_del3.Repository;
 
 import gruppe7.turistguide_del3.Model.Attraction;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
 @Repository
 public class AttractionRepository {
-    private final List<Attraction> attractions = new ArrayList<>();
-    private int id;
-    private final List<String> towns = new ArrayList<>();
-    private final List<String> tagsList = new ArrayList<>();
-    private boolean initialized = false;
-
-    public AttractionRepository() {
-        populateAttractions();
-        populateTagsList();
-        populateTownList();
-    }
-    public List<String> getTownList () {
-        return towns;
-    }
-    private void populateTownList () {
-        towns.add("København");
-        towns.add("Paris");
-        towns.add("Odense");
-        towns.add("Berlin");
-        towns.add("Montevideo");
-        towns.add("Luxembough");
-        towns.add("Longyearbyen");
-    }
-
-    public List<String> getTagsList () {
-        return tagsList;
-    }
-    private void populateTagsList () {
-        tagsList.add("Tårn");
-        tagsList.add("Historisk");
-        tagsList.add("Natur");
-        tagsList.add("Eventyr");
-        tagsList.add("Museum");
-        tagsList.add("Figur");
-    }
-    private void populateAttractions () {
-        attractions.add(new Attraction("Rundetårn", "Højt rundt tårn i midten af København", "København", List.of("Tårn", "Historisk", "Museum")));
-        attractions.add(new Attraction("Eiffel Tower", "Tower in paris","Paris", List.of("Tårn", "Historisk", "Natur")));
-        attractions.add(new Attraction("Lille havfrue", "Kendt dansk figur baseret på H.C Andersens eventyr Den Lille Havfrue","København", List.of("Eventyr", "Figur")));
-    }
-
+@Value("${spring.datasource.url}")
+private String url;
+@Value("${spring.datasource.username}")
+private String username;
+@Value("${spring.datasource.password}")
+private String password;
 
     public List<Attraction> getAllAttractions () {
+        List<Attraction> attractions = new ArrayList<>();
+
+        String query = "SELECT * FROM attractions";
+        try(Connection con = DriverManager.getConnection(url, username, password)){
+            Statement statement = con.createStatement();
+            ResultSet resultSet = statement.executeQuery(query);
+
+            while (resultSet.next()) {
+                Attraction attraction = new Attraction();
+                attraction.setId(resultSet.getInt("attraction_id"));
+                attraction.setName(resultSet.getString("name"));
+                attraction.setDescription(resultSet.getString("description"));
+                attraction.setFee(resultSet.getInt("fee"));
+                attraction.setCityId(resultSet.getInt("city_id"));
+                attractions.add(attraction);
+            }
+
+        }catch(SQLException e){
+            e.printStackTrace();
+        }
+
         return attractions;
     }
 
 
-    public Attraction getAttractionByName(String name) {
-        for (Attraction touristAttraction : attractions) {
-            if (touristAttraction.getName().equals(name)) {
-                return touristAttraction;
+    public List<Attraction> getAttractionByName(String name) {
+
+        List<Attraction> attractions = new ArrayList<>();
+
+        String query = "SELECT * FROM attractions WHERE name = ?";
+
+        try(Connection con = DriverManager.getConnection(url, username, password)) {
+            PreparedStatement statement = con.prepareStatement(query);
+
+            statement.setString(1, name);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                Attraction attraction = new Attraction();
+                attraction.setId(resultSet.getInt("attraction_id"));
+                attraction.setName(resultSet.getString("name"));
+                attraction.setDescription(resultSet.getString("description"));
+                attraction.setFee(resultSet.getInt("fee"));
+                attraction.setCityId(resultSet.getInt("city_id"));
+                attractions.add(attraction);
             }
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
-        return null;
+
+        return attractions;
+
     }
 
     public List<String> getTagsByName(String name) {
         List<String> tags = new ArrayList<>();
-        for (Attraction touristAttraction : attractions) {
-            if (touristAttraction.getName().equals(name)) {
-                tags.addAll(touristAttraction.getTags());
+
+        String query = "SELECT T.name FROM TAG T " + "JOIN ATTRACTION_TAG AT ON T.tag_id = AT.tag_id " +
+                "JOIN ATTRACTION A ON A.attraction_id = AT.attraction_id " + "WHERE A.name = ?";
+
+        try(Connection con = DriverManager.getConnection(url, username, password)) {
+            PreparedStatement statement = con.prepareStatement(query);
+
+            statement.setString(1, name);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                tags.add(resultSet.getString("name"));
             }
+
+        }catch (SQLException e){
+            e.printStackTrace();
         }
+
         return tags;
+
     }
 
 
-    public Attraction addAttraction(Attraction attraction) {
-        attractions.add(attraction);
-        return attraction;
-    }
+    public int addAttraction(Attraction attraction) {
 
+        int updatedRows = 0;
 
-    /*public Tourist updateAttraction(Tourist attraction) {
-        int index = attractions.indexOf(attraction);
-        attractions.set(index, attraction);
-        return attraction;
-    }*/
+        String query = "INSERT INTO ATTRACTION (name, description, fee, city_id) VALUES (?, ?, ?, ?)";
 
-    public Attraction updateAttraction(Attraction updatedAttraction) {
-        for (int i = 0; i < attractions.size(); i++) {
-            Attraction attraction = attractions.get(i);
-            if (attraction.getName().equals(updatedAttraction.getName())) {
-                attractions.set(i, updatedAttraction); // Replace old attraction with updated one
-                return updatedAttraction;
-            }
+        try(Connection con = DriverManager.getConnection(url, username, password)){
+            PreparedStatement statement = con.prepareStatement(query);
+
+            statement.setString(1, attraction.getName());
+            statement.setString(2, attraction.getDescription());
+            statement.setInt(3, attraction.getFee());
+            statement.setInt(4, attraction.getCityID());
+
+            updatedRows = statement.executeUpdate();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        return null; // Return null if the attraction was not found
+
+        return updatedRows;
+
+    }
+
+    public int deleteAttraction(int attractionId) {
+        int updatedRows = 0;
+
+        String query = "DELETE FROM ATTRACTION WHERE attraction_id = ?";
+
+        try(Connection con = DriverManager.getConnection(url, username, password){
+            PreparedStatement statement = con.prepareStatement(query);
+
+            statement.setInt(1, attractionId);
+
+            updatedRows = statement.executeUpdate();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return updatedRows;
     }
 
 
-    public void deleteAttraction(Attraction attraction) {
-        attractions.remove(attraction);
+    public int updateAttraction(Attraction attraction) {
+
+        int updatedRows = 0;
+
+        String query = "UPDATE ATTRACTION SET name = ?, description = ?, fee = ?, city_id = ? WHERE attraction_id = ? ";
+
+        try(Connection con = DriverManager.getConnection(url, username, password)){
+            PreparedStatement statement = con.prepareStatement(query);
+
+            statement.setString(1, attraction.getName());
+            statement.setString(2, attraction.getDescription());
+            statement.setInt(3, attraction.getFee());
+            statement.setInt(4, attraction.getCityID());
+            statement.setInt(5, attraction.getId());
+
+            updatedRows = statement.executeUpdate();
+
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+
+        return updatedRows;
     }
 
     public List<Attraction> addAttractionList(Attraction attraction) {

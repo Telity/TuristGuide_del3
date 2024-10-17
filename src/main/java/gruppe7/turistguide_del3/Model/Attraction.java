@@ -5,9 +5,12 @@ import java.util.List;
 
 public class Attraction {
 
+    private int id;
     private String name;
     private String description;
     private String town;
+    private int fee;
+    private int cityID;
     private List<String> tags = new ArrayList<>();
 
     public Attraction(String name, String description, String town, List<String> tags) {
@@ -21,12 +24,24 @@ public class Attraction {
 
     }
 
+    public int getId() {
+        return id;
+    }
+
+    public int getFee() {
+        return fee;
+    }
+
     public String getName() {
         return name;
     }
 
     public List<String> getTags() {
         return tags;
+    }
+
+    public int getCityID() {
+        return cityID;
     }
 
     public void setTags(List<String> tags) {
@@ -41,6 +56,14 @@ public class Attraction {
         this.town = town;
     }
 
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public void setFee(int fee) {
+        this.fee = fee;
+    }
+
     public void setName(String name) {
         this.name = name;
     }
@@ -50,4 +73,9 @@ public class Attraction {
     public void setDescription(String description) {
         this.description = description;
     }
+
+    public void setCityId(int cityID) {
+        this.cityID = cityID;
+    }
+
 }
