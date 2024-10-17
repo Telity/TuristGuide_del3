@@ -217,8 +217,3 @@ public class AttractionRepository {
     }
 }
 
-    /* public List<Attraction> addAttractionList(Attraction attraction) {
-        attractions.add(attraction);
-        return attractions;
-    }
-     */
