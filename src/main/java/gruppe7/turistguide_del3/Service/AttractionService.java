@@ -18,7 +18,7 @@ public class AttractionService {
         return attractionRepository.getAllAttractions();
     }
 
-    public List<Attraction> getAttractionByName(String name) {
+    public Attraction getAttractionByName(String name) {
         return attractionRepository.getAttractionByName(name);
     }
 

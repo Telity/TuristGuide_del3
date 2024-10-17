@@ -1,0 +1,42 @@
+
+table {
+    width: 500px;
+    margin: 0 auto;
+    border-collapse: collapse;
+}
+
+td, th {
+    text-align: center;
+    padding: 10px;
+    border: 1px solid black;
+    background-color: antiquewhite;
+}
+
+body {
+    min-height: 100vh;
+    width: auto;
+    text-align: center;
+    background-color: aliceblue;
+}
+
+nav{
+    padding-top: 2em;
+    padding-bottom: 2em;
+    font-size: 1.5em;
+}
+
+nav a{
+    color: black;
+    text-decoration: none; /* fjerner underlines */
+    margin: 20px;
+    transition: transform 0.3s ease-in-out;
+
+}
+
+nav a:hover {
+    transform: scale(1.8);
+    background-color: antiquewhite;
+    border-radius: 5px;
+    padding: 5px 10px;
+}
+

@@ -1,0 +1,36 @@
+body {
+    vertical-align: middle;
+    max-width: 650px;
+    margin: auto;
+    background: white;
+    padding: 10px;
+}
+
+h1 {
+    font-family: Arial, serif;
+    font-size: 1.5em;
+}
+label {
+    width: 150px;
+    display: inline-block;
+
+}
+table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+    padding: 5px;
+    table-layout: auto; /* Allows the table to adjust column widths dynamically */
+}
+th, td {
+    max-width: 150px; /* Optional: Control maximum width for each column except the tags */
+}
+th {
+    text-align: left;
+}
+select, input[type="text"], input[type="number"]
+{
+    width:200px;
+    box-sizing:border-box;
+}
+
+

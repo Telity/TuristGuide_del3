@@ -88,9 +88,7 @@ public class AttractionRepository {
 
     }
 
-    public List<Attraction> getAttractionByName(String name) {
-
-        List<Attraction> attractions = new ArrayList<>();
+    public Attraction getAttractionByName(String name) {
 
         String query = "SELECT * FROM ATTRACTION WHERE name = ?";
 
@@ -100,28 +98,53 @@ public class AttractionRepository {
             statement.setString(1, name);
             ResultSet resultSet = statement.executeQuery();
 
+            Attraction attraction = null;
+
             while (resultSet.next()) {
-                Attraction attraction = new Attraction();
+                attraction = new Attraction();
                 attraction.setId(resultSet.getInt("attraction_id"));
                 attraction.setName(resultSet.getString("name"));
                 attraction.setDescription(resultSet.getString("description"));
                 attraction.setFee(resultSet.getInt("fee"));
                 attraction.setCityId(resultSet.getInt("city_id"));
-                attractions.add(attraction);
+                attraction.setTown(getTownByCityId(attraction.getCityID()));
             }
+
+            return attraction;
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+    }
 
-        return attractions;
+    private String getTownByCityId(int cityId) {
+
+        String town = null;
+
+        String query = "SELECT * FROM CITY WHERE city_id = ?";
+
+        try(Connection con = DriverManager.getConnection(url, username, password)){
+            PreparedStatement statement = con.prepareStatement(query);
+            statement.setInt(1, cityId);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            while(resultSet.next()){
+               town = resultSet.getString("city_name");
+            }
+
+        }catch(SQLException e){
+            throw new RuntimeException(e);
+        }
+
+        return town;
 
     }
 
     public List<String> getTagsByName(String name) {
         List<String> tags = new ArrayList<>();
 
-        String query = "SELECT T.name FROM TAG T " + "JOIN ATTRACTION_TAG AT ON T.tag_id = AT.tag_id " +
+        String query = "SELECT T.tag_name FROM TAG T " + "JOIN ATTRACTION_TAG AT ON T.tag_id = AT.tag_id " +
                 "JOIN ATTRACTION A ON A.attraction_id = AT.attraction_id " + "WHERE A.name = ?";
 
         try (Connection con = DriverManager.getConnection(url, username, password)) {
@@ -131,7 +154,7 @@ public class AttractionRepository {
             ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
-                tags.add(resultSet.getString("name"));
+                tags.add(resultSet.getString("tag_name"));
             }
 
         } catch (SQLException e) {

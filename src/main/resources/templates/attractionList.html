@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Landing Page</title>
+    <link th:href = "@{../main.css}" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+</head>
+<body>
+<header>
+<h1>Turistattraktioner</h1>
+</header>
+
+<table>
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>By</th>
+        <th class="column" colspan="3"> </th>
+    </tr>
+    </thead>
+
+<tbody>
+    <tr th:each="attraction : ${attractions}" >
+
+        <td>
+            <a th:href="@{'/attractions/' + ${attraction.name}}" th:text="${attraction.name}"></a>   <!-- Navn -->
+        </td>
+
+        <td>
+        <a th:text="${attraction.description}"></a>
+        </td>
+
+        <td>
+            <a th:text="${attraction.town}"></a>
+        </td>
+
+        <td>
+            <form th:action="@{'/attractions/' + ${attraction.name} + '/edit'}"  method="GET">
+            <input type="submit" value="Opdater">
+            </form>
+        </td>
+
+        <td>
+            <form th:action="@{'/attractions/' + ${attraction.name} + '/delete'}" method="POST">
+                <input type="submit" value="Slet">
+            </form>
+        </td>
+
+        <td>
+            <form th:action="@{'/attractions/' + ${attraction.name} + '/tags'}" method="GET">
+            <input type="submit" value="Tags">
+            </form>
+        </td>
+    </tr>
+</tbody>
+</table>
+
+<br>
+
+<form th:action="@{'/attractions' + '/add'}" method="GET">
+<input type="submit" value="Tilføj attraktion">
+</form>
+
+</body>
+</html>

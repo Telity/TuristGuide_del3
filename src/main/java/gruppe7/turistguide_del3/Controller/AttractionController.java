@@ -27,8 +27,8 @@ public class AttractionController {
 
     @GetMapping("/{name}")
     public String getAttraction(@PathVariable("name") String name, Model model) {
-        List<Attraction> attractions = touristService.getAttractionByName(name);
-        model.addAttribute("attraction", attractions);
+        Attraction attraction = touristService.getAttractionByName(name);
+        model.addAttribute("attraction", attraction);
         return "attractionNames";
     }
 
@@ -78,7 +78,7 @@ public class AttractionController {
     // Viser formular til at opdatere en attraktion
     @GetMapping("/{name}/edit")
     public String showUpdateForm(@PathVariable("name") String name, Model model) {
-        List<Attraction> attraction = touristService.getAttractionByName(name);
+        Attraction attraction = touristService.getAttractionByName(name);
         model.addAttribute("attraction", attraction);
         model.addAttribute("tags",touristService.getTagsList());
         model.addAttribute("towns",touristService.getTownList());
