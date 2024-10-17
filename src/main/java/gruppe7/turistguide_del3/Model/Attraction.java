@@ -20,6 +20,16 @@ public class Attraction {
         this.tags = tags;
     }
 
+    public Attraction(int id, String name, String description, String town, int fee, int cityID, List<String> tags) {
+        this.id = id;
+        this.name = name;
+        this.description = description;
+        this.town = town;
+        this.fee = fee;
+        this.cityID = cityID;
+        this.tags = tags;
+    }
+
     public Attraction() {
 
     }

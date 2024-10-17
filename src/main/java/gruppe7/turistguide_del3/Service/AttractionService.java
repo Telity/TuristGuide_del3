@@ -49,7 +49,7 @@ public class AttractionService {
         return attractionRepository.getTagsList();
     }
 
-    public Object getTownList() {
+    public List<String> getTownList() {
         return attractionRepository.getTownList();
     }
 
