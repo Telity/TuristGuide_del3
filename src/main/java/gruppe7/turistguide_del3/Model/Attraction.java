@@ -10,28 +10,10 @@ public class Attraction {
     private String description;
     private String town;
     private int fee;
-    private int cityID;
+    private Integer cityID;
     private List<String> tags = new ArrayList<>();
 
-    public Attraction(String name, String description, String town, List<String> tags) {
-        this.name = name;
-        this.description = description;
-        this.town = town;
-        this.tags = tags;
-    }
-
-    public Attraction(int id, String name, String description, String town, int fee, int cityID, List<String> tags) {
-        this.id = id;
-        this.name = name;
-        this.description = description;
-        this.town = town;
-        this.fee = fee;
-        this.cityID = cityID;
-        this.tags = tags;
-    }
-
     public Attraction() {
-
     }
 
     public int getId() {
@@ -50,7 +32,7 @@ public class Attraction {
         return tags;
     }
 
-    public int getCityID() {
+    public Integer getCityID() {
         return cityID;
     }
 
@@ -77,6 +59,7 @@ public class Attraction {
     public void setName(String name) {
         this.name = name;
     }
+
     public String getDescription() {
         return description;
     }
@@ -84,7 +67,7 @@ public class Attraction {
         this.description = description;
     }
 
-    public void setCityId(int cityID) {
+    public void setCityID(Integer cityID) {
         this.cityID = cityID;
     }
 

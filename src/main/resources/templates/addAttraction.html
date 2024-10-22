@@ -18,7 +18,10 @@
     </div>
     <div>
     <label>Town:</label>
-    <input type="text" th:field="*{town}">
+    <select th:field="*{cityID}" required>
+        <option value="" disabled selected>Select a City</option>
+        <option th:each="town : ${towns}" th:value="${town.city_id}" th:text="${town.city_name}"></option>
+    </select>
     </div>
     <div>
         <h3>Select Tags</h3>
@@ -26,7 +29,7 @@
             <li th:each="tag : ${attractionTags}">
                 <label>
                     <input type="checkbox" th:value="${tag}" th:field="*{tags}" />
-                    <span th:text="${tag}"></span>
+                    <span th:text="${tag.tag_name}"></span>
                 </label>
             </li>
         </ul>

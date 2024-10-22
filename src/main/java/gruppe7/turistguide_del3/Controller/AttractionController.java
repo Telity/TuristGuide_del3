@@ -2,6 +2,8 @@ package gruppe7.turistguide_del3.Controller;
 
 
 import gruppe7.turistguide_del3.Model.Attraction;
+import gruppe7.turistguide_del3.Model.City;
+import gruppe7.turistguide_del3.Model.Tag;
 import gruppe7.turistguide_del3.Service.AttractionService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -28,6 +30,12 @@ public class AttractionController {
     @GetMapping("/{name}")
     public String getAttraction(@PathVariable("name") String name, Model model) {
         Attraction attraction = touristService.getAttractionByName(name);
+
+        if (attraction == null) {
+            // Hvis attraktionen ikke findes, omdiriger eller vis en fejlmeddelelse
+            return "redirect:/attractions"; // Omdiriger til listen over attraktioner
+        }
+
         model.addAttribute("attraction", attraction);
         return "attractionNames";
     }
@@ -42,16 +50,31 @@ public class AttractionController {
     @GetMapping("/add") // displays form
     public String addAttraction(Model model) {
         //adding list with tags options
-        List<String> attractionTags = touristService.getTagsList();
+        List<Tag> attractionTags = touristService.getTagsList();
+        List<City> towns = touristService.getTownList();
+
+        System.out.println("Towns: " + towns);
+
         //makes a new tourist that will get values from the html
         Attraction attraction = new Attraction();
+
         model.addAttribute("attractionTags", attractionTags);
+        model.addAttribute("towns", towns);
         model.addAttribute("attraction", attraction);
         return "addAttraction";
     }
 
     @PostMapping("/save")
     public String saveAttraction(@ModelAttribute Attraction attraction){
+
+        System.out.println("City ID: " + attraction.getCityID());
+
+        // Håndter null-værdi
+        if (attraction.getCityID() == null) {
+            // Returner tilføjelsesformularen med en fejlmeddelelse
+            return "addAttraction"; // Alternativt, redirect til en side med en fejlmeddelelse
+        }
+
         touristService.addAttraction(attraction);
         return "redirect:/attractions";
     }
@@ -79,16 +102,29 @@ public class AttractionController {
     @GetMapping("/{name}/edit")
     public String showUpdateForm(@PathVariable("name") String name, Model model) {
         Attraction attraction = touristService.getAttractionByName(name);
+        List<Tag> tags = touristService.getTagsList();
+        List<City> towns = touristService.getTownList();
+
         model.addAttribute("attraction", attraction);
-        model.addAttribute("tags",touristService.getTagsList());
-        model.addAttribute("towns",touristService.getTownList());
+        model.addAttribute("tags",tags);
+        model.addAttribute("towns", towns);
         return "updateAttractions"; // navnet på din HTML-skabelon
     }
 
     // Håndterer formularindsendelse for opdatering
     @PostMapping("/update")
-    public String updateAttraction(@ModelAttribute Attraction attraction) {
-        touristService.updateAttraction(attraction);
+    public String updateAttraction(@ModelAttribute Attraction attraction, @RequestParam List<Integer> tagIds){
+
+        List<Tag> tags = tagIds.stream()
+                .map(tag_id -> {
+                    Tag tag = new Tag(); // Antag, at du har en standard konstruktør
+                    tag.setTag_id(tag_id); // Sæt id for tag
+                    return tag;
+                })
+                .toList();
+
+        touristService.updateAttraction(attraction, tags);
+
         return "redirect:/attractions"; // Omdiriger til listen over attraktioner
     }
 

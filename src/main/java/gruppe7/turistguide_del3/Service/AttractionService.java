@@ -1,6 +1,8 @@
 package gruppe7.turistguide_del3.Service;
 
 import gruppe7.turistguide_del3.Model.Attraction;
+import gruppe7.turistguide_del3.Model.City;
+import gruppe7.turistguide_del3.Model.Tag;
 import gruppe7.turistguide_del3.Repository.AttractionRepository;
 import org.springframework.stereotype.Service;
 
@@ -26,8 +28,8 @@ public class AttractionService {
         attractionRepository.addAttraction(attraction);
     }
 
-    public Attraction updateAttraction(Attraction attraction) {
-        int updatedRows = attractionRepository.updateAttraction(attraction);
+    public Attraction updateAttraction(Attraction attraction, List<Tag> tags) {
+        int updatedRows = attractionRepository.updateAttraction(attraction, tags);
 
         if(updatedRows > 0){
             return attraction;
@@ -40,16 +42,16 @@ public class AttractionService {
        return attractionRepository.deleteAttraction(name);
     }
 
-    public List<Attraction> AddAttractionsList(Attraction attraction) {
+   /* public List<Attraction> AddAttractionsList(Attraction attraction) {
         attractionRepository.addAttraction(attraction);
         return attractionRepository.getAllAttractions();
-    }
+    } */
 
-    public List<String> getTagsList() {
+    public List<Tag> getTagsList() {
         return attractionRepository.getTagsList();
     }
 
-    public List<String> getTownList() {
+    public List<City> getTownList() {
         return attractionRepository.getTownList();
     }
 

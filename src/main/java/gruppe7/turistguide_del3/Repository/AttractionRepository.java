@@ -1,6 +1,8 @@
 package gruppe7.turistguide_del3.Repository;
 
 import gruppe7.turistguide_del3.Model.Attraction;
+import gruppe7.turistguide_del3.Model.City;
+import gruppe7.turistguide_del3.Model.Tag;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 
@@ -34,7 +36,7 @@ public class AttractionRepository {
                 attraction.setName(resultSet.getString("name"));
                 attraction.setDescription(resultSet.getString("description"));
                 attraction.setFee(resultSet.getInt("fee"));
-                attraction.setCityId(resultSet.getInt("city_id"));
+                attraction.setCityID(resultSet.getInt("city_id"));
                 attractions.add(attraction);
             }
 
@@ -45,17 +47,20 @@ public class AttractionRepository {
         return attractions;
     }
 
-    public List<String> getTagsList(){
-        List<String> tags = new ArrayList<>();
+    public List<Tag> getTagsList() {
+        List<Tag> tags = new ArrayList<>();
 
         String query = "SELECT * FROM TAG";
 
-        try(Connection con = DriverManager.getConnection(url, username, password)){
+        try (Connection con = DriverManager.getConnection(url, username, password)) {
             Statement statement = con.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
 
-            while(resultSet.next()){
-                tags.add(resultSet.getString("tag_name"));
+            while (resultSet.next()) {
+                Tag tag = new Tag();
+                tag.setTag_id(resultSet.getInt("tag_id"));
+                tag.setTag_name(resultSet.getString("tag_name"));
+                tags.add(tag);
             }
 
         } catch (Exception e) {
@@ -63,21 +68,23 @@ public class AttractionRepository {
         }
 
         return tags;
-
     }
 
-    public List<String> getTownList(){
+    public List<City> getTownList() {
 
-        List<String> towns = new ArrayList<>();
+        List<City> towns = new ArrayList<>();
 
         String query = "SELECT * FROM CITY";
 
-        try(Connection con = DriverManager.getConnection(url, username, password)){
+        try (Connection con = DriverManager.getConnection(url, username, password)) {
             Statement statement = con.createStatement();
             ResultSet resultSet = statement.executeQuery(query);
 
-            while(resultSet.next()){
-                towns.add(resultSet.getString("city_name"));
+            while (resultSet.next()) {
+                City city = new City();
+                city.setCity_id(resultSet.getInt("city_id"));
+                city.setCity_name(resultSet.getString("city_name"));
+                towns.add(city);
             }
 
         } catch (Exception e) {
@@ -85,7 +92,6 @@ public class AttractionRepository {
         }
 
         return towns;
-
     }
 
     public Attraction getAttractionByName(String name) {
@@ -98,23 +104,22 @@ public class AttractionRepository {
             statement.setString(1, name);
             ResultSet resultSet = statement.executeQuery();
 
-            Attraction attraction = null;
 
             while (resultSet.next()) {
-                attraction = new Attraction();
+                Attraction attraction = new Attraction();
                 attraction.setId(resultSet.getInt("attraction_id"));
                 attraction.setName(resultSet.getString("name"));
                 attraction.setDescription(resultSet.getString("description"));
-                attraction.setFee(resultSet.getInt("fee"));
-                attraction.setCityId(resultSet.getInt("city_id"));
+                attraction.setCityID(resultSet.getInt("city_id"));
                 attraction.setTown(getTownByCityId(attraction.getCityID()));
+                return attraction;
             }
-
-            return attraction;
 
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+        return null;
     }
 
     private String getTownByCityId(int cityId) {
@@ -123,17 +128,17 @@ public class AttractionRepository {
 
         String query = "SELECT * FROM CITY WHERE city_id = ?";
 
-        try(Connection con = DriverManager.getConnection(url, username, password)){
+        try (Connection con = DriverManager.getConnection(url, username, password)) {
             PreparedStatement statement = con.prepareStatement(query);
             statement.setInt(1, cityId);
 
             ResultSet resultSet = statement.executeQuery();
 
-            while(resultSet.next()){
-               town = resultSet.getString("city_name");
+            while (resultSet.next()) {
+                town = resultSet.getString("city_name");
             }
 
-        }catch(SQLException e){
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
 
@@ -166,7 +171,7 @@ public class AttractionRepository {
     }
 
 
-    public Attraction addAttraction(Attraction attraction) {
+    public void addAttraction(Attraction attraction) {
 
         String query = "INSERT INTO ATTRACTION (name, description, fee, city_id) VALUES (?, ?, ?, ?)";
 
@@ -176,13 +181,20 @@ public class AttractionRepository {
             statement.setString(1, attraction.getName());
             statement.setString(2, attraction.getDescription());
             statement.setInt(3, attraction.getFee());
-            statement.setInt(4, attraction.getCityID());
+
+            // Hvis cityID er null, sætter vi værdien til NULL i databasen i stedet for at få en fejl.
+            // Dette kunne også gøres i databasen ved at skrive NOT NULL ud fra city_id
+            if (attraction.getCityID() != null) {
+                statement.setInt(4, attraction.getCityID());
+            } else {
+                statement.setNull(4, java.sql.Types.INTEGER); // Sæt som NULL hvis cityID er null
+            }
 
             int updatedRows = statement.executeUpdate();
 
-            if(updatedRows > 0){
+            if (updatedRows > 0) {
                 ResultSet result = statement.getGeneratedKeys(); // get the generated key
-                if(result.next()){
+                if (result.next()) {
                     int generatedId = result.getInt(1);
                     attraction.setId(generatedId);
                 }
@@ -191,8 +203,6 @@ public class AttractionRepository {
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-
-        return attraction;
     }
 
     public int deleteAttraction(String name) {
@@ -215,11 +225,13 @@ public class AttractionRepository {
     }
 
 
-    public int updateAttraction(Attraction attraction) {
+    public int updateAttraction(Attraction attraction, List<Tag> tags) {
 
         int updatedRows = 0;
 
         String query = "UPDATE ATTRACTION SET name = ?, description = ?, fee = ?, city_id = ? WHERE attraction_id = ? ";
+        String deleteTags = "DELETE FROM ATTRACTION_TAG WHERE attraction_id = ?";
+        String addNewTags = "INSERT INTO ATTRACTION_TAG (attraction_id, tag_id) VALUES (?, ?)";
 
         try (Connection con = DriverManager.getConnection(url, username, password)) {
             PreparedStatement statement = con.prepareStatement(query);
@@ -227,12 +239,42 @@ public class AttractionRepository {
             statement.setString(1, attraction.getName());
             statement.setString(2, attraction.getDescription());
             statement.setInt(3, attraction.getFee());
-            statement.setInt(4, attraction.getCityID());
+
+            if (attraction.getCityID() != null) {
+                statement.setInt(4, attraction.getCityID());
+            } else {
+                statement.setNull(4, java.sql.Types.INTEGER); // Sæt som NULL hvis cityID er null
+            }
             statement.setInt(5, attraction.getId());
 
             updatedRows = statement.executeUpdate();
 
         } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+
+        try (Connection con = DriverManager.getConnection(url, username, password)) {
+            PreparedStatement deletestatement = con.prepareStatement(deleteTags);
+
+            deletestatement.setInt(1, attraction.getId());
+
+            deletestatement.executeUpdate();
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        try(Connection con = DriverManager.getConnection(url, username, password)){
+            PreparedStatement updateStatement = con.prepareStatement(addNewTags);
+            for(Tag tag : tags) {
+                updateStatement.setInt(1, attraction.getId());
+                updateStatement.setInt(2, tag.getTag_id());
+                updateStatement.addBatch();
+            }
+            updateStatement.executeBatch();
+
+        } catch (SQLException e) {
             throw new RuntimeException(e);
         }
 
