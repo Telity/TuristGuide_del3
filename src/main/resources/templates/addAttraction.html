@@ -2,39 +2,38 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <title>Add Attraction</title>
-    <link rel="stylesheet" th:href="@{../addAttraction.css}">
+    <link rel="stylesheet" th:href="@{/css/addAttraction.css}">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
 </head>
 <body>
-<h1>Add Attraction</h1>
+<h1>Tilføj Attraktion</h1>
 <form action="#" th:action="@{save}" th:object="${attraction}" method="post">
     <div>
-    <label>Name:</label>
+    <label>Navn:</label>
     <input type="text" th:field="*{name}">
     </div>
     <div>
-    <label>Description:</label>
+    <label>Beskrivelse:</label>
     <input id="description" type="text" th:field="*{description}">
     </div>
     <div>
-    <label>Town:</label>
+    <label>Vælg by:</label>
     <select th:field="*{cityID}" required>
         <option value="" disabled selected>Select a City</option>
         <option th:each="town : ${towns}" th:value="${town.city_id}" th:text="${town.city_name}"></option>
     </select>
     </div>
     <div>
-        <h3>Select Tags</h3>
+        <h3>Tilføj tags til attraktionen</h3>
         <ul>
             <li th:each="tag : ${attractionTags}">
                 <label>
-                    <input type="checkbox" th:value="${tag}" th:field="*{tags}" />
-                    <span th:text="${tag.tag_name}"></span>
+                    <input type="checkbox" th:value="${tag.tag_id}" th:text="${tag.tag_name}" name="tagIds" />
                 </label>
             </li>
         </ul>
     </div>
-    <button type="submit">Add Attraction</button>
+    <button type="submit">Tilføj Attraktion</button>
 </form>
 
 <br>

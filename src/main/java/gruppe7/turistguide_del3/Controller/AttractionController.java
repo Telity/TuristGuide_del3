@@ -65,17 +65,19 @@ public class AttractionController {
     }
 
     @PostMapping("/save")
-    public String saveAttraction(@ModelAttribute Attraction attraction){
+    public String saveAttraction(@ModelAttribute Attraction attraction, @RequestParam List<Integer> tagIds){
 
-        System.out.println("City ID: " + attraction.getCityID());
+        // hvis brugeren har valgt tag-id'erne 1, 2, og 3, sendes disse som en liste af værdier med navnet tagIds.
+        // RequestParam List<Integer> tagIds beder Spring om at binde alle værdier med dette navn til en liste af heltal.
+        List<Tag> tags = tagIds.stream()
+                .map(tag_id -> {
+                    Tag tag = new Tag(); // Antag, at du har en standard konstruktør
+                    tag.setTag_id(tag_id); // Sæt id for tag
+                    return tag;
+                })
+                .toList();
 
-        // Håndter null-værdi
-        if (attraction.getCityID() == null) {
-            // Returner tilføjelsesformularen med en fejlmeddelelse
-            return "addAttraction"; // Alternativt, redirect til en side med en fejlmeddelelse
-        }
-
-        touristService.addAttraction(attraction);
+        touristService.addAttraction(attraction, tags);
         return "redirect:/attractions";
     }
 

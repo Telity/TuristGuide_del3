@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Opdater Attraktion</title>
+    <link rel="stylesheet" th:href="@{/css/addAttraction.css}">
     <link rel="icon" type="image/x-icon" href="/favicon.ico">
 </head>
 <body>
-
 <h1>Opdater Attraktion</h1>
 
 <form th:action="@{/attractions/update}" th:object="${attraction}" method="post">
@@ -14,21 +14,28 @@
     <!-- Skjult felt til ID, som bruges til at identificere den specifikke attraktion, der skal opdateres -->
     <input type="hidden" th:field="*{id}" />
 
+    <div>
     <label for="name">Navn:</label>
     <input type="text" id="name" th:field="*{name}" readonly="readonly"/>
+    </div>
 
+    <div>
     <label for="description">Beskrivelse:</label>
     <input type="text" id="description" th:field="*{description}" />
+    </div>
 
-    <label for="town">Town:</label>
+    <div>
+    <label for="town">Vælg by:</label>
     <select id="town" name="town" th:field="*{cityID}">
         <option th:each="town : ${towns}" th:value="${town.city_id}" th:text="${town.city_name}"></option>
     </select>
+    </div>
 
-    <h3>Select Tags</h3>
+
+    <h3>Tilføj tags til turistattraktionen </h3>
     <ul>
         <li th:each="tag : ${tags}">
-            <input type="checkbox" th:value="${tag.tag_id}" th:text="${tag.tag_name}" th:id="'tag' + ${tag.tag_id}" name="tagIds" />
+            <input type="checkbox" th:value="${tag.tag_id}" th:text="${tag.tag_name}" name="tagIds" />
         </li>
     </ul>
 

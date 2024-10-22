@@ -37,6 +37,7 @@ public class AttractionRepository {
                 attraction.setDescription(resultSet.getString("description"));
                 attraction.setFee(resultSet.getInt("fee"));
                 attraction.setCityID(resultSet.getInt("city_id"));
+                attraction.setTown(getTownByCityId(attraction.getCityID()));
                 attractions.add(attraction);
             }
 
@@ -171,38 +172,52 @@ public class AttractionRepository {
     }
 
 
-    public void addAttraction(Attraction attraction) {
+    public void addAttraction(Attraction attraction, List<Tag> tags) {
 
         String query = "INSERT INTO ATTRACTION (name, description, fee, city_id) VALUES (?, ?, ?, ?)";
+        String queryTags = "INSERT INTO ATTRACTION_TAG (attraction_id, tag_id) VALUES (?, ?)";
 
-        try (Connection con = DriverManager.getConnection(url, username, password)) {
-            PreparedStatement statement = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS);
+        try(Connection con = DriverManager.getConnection(url, username, password)) {
 
-            statement.setString(1, attraction.getName());
-            statement.setString(2, attraction.getDescription());
-            statement.setInt(3, attraction.getFee());
+            try (PreparedStatement statement = con.prepareStatement(query, Statement.RETURN_GENERATED_KEYS)) {
+                statement.setString(1, attraction.getName());
+                statement.setString(2, attraction.getDescription());
+                statement.setInt(3, attraction.getFee());
 
-            // Hvis cityID er null, sætter vi værdien til NULL i databasen i stedet for at få en fejl.
-            // Dette kunne også gøres i databasen ved at skrive NOT NULL ud fra city_id
-            if (attraction.getCityID() != null) {
-                statement.setInt(4, attraction.getCityID());
-            } else {
-                statement.setNull(4, java.sql.Types.INTEGER); // Sæt som NULL hvis cityID er null
-            }
-
-            int updatedRows = statement.executeUpdate();
-
-            if (updatedRows > 0) {
-                ResultSet result = statement.getGeneratedKeys(); // get the generated key
-                if (result.next()) {
-                    int generatedId = result.getInt(1);
-                    attraction.setId(generatedId);
+                // Hvis cityID er null, sætter vi værdien til NULL i databasen i stedet for at få en fejl.
+                // Dette kunne også gøres i databasen ved at skrive NOT NULL ud fra city_id
+                if (attraction.getCityID() != null) {
+                    statement.setInt(4, attraction.getCityID());
+                } else {
+                    statement.setNull(4, java.sql.Types.INTEGER); // Sæt som NULL hvis cityID er null
                 }
-            }
 
-        } catch (Exception e) {
+                int updatedRows = statement.executeUpdate();
+
+                if (updatedRows > 0) {
+                    ResultSet result = statement.getGeneratedKeys(); // get the generated key
+                    if (result.next()) {
+                        int generatedId = result.getInt(1);
+                        attraction.setId(generatedId);
+                    }
+                }
+
+                try (PreparedStatement tagStatement = con.prepareStatement(queryTags)) {
+                    for (Tag tag : tags) {
+                        tagStatement.setInt(1, attraction.getId());
+                        tagStatement.setInt(2, tag.getTag_id());
+                        tagStatement.addBatch();
+                    }
+                    tagStatement.executeBatch();
+                }
+
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }catch(SQLException e){
             throw new RuntimeException(e);
         }
+
     }
 
     public int deleteAttraction(String name) {

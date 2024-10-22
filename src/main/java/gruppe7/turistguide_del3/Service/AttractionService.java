@@ -24,8 +24,8 @@ public class AttractionService {
         return attractionRepository.getAttractionByName(name);
     }
 
-    public void addAttraction(Attraction attraction) {
-        attractionRepository.addAttraction(attraction);
+    public void addAttraction(Attraction attraction, List<Tag> tags) {
+        attractionRepository.addAttraction(attraction, tags);
     }
 
     public Attraction updateAttraction(Attraction attraction, List<Tag> tags) {
