@@ -14,12 +14,15 @@ import java.util.List;
 @RequestMapping("/attractions")
 public class AttractionController {
 
+    // Service layer that handles the business logic for attractions
     public final AttractionService touristService;
 
+    // Constructor that injects the AttractionService
     public AttractionController(AttractionService touristService) {
         this.touristService = touristService;
     }
 
+    // Retrieves all attractions and displays them in a list
     @GetMapping("")
     public String getAllAttractions(Model model) {
         List<Attraction> allAttractions = touristService.getAllAttractions();
@@ -27,6 +30,7 @@ public class AttractionController {
         return "attractionList";
     }
 
+    // Fetches a single attraction by name and displays its details
     @GetMapping("/{name}")
     public String getAttraction(@PathVariable("name") String name, Model model) {
         Attraction attraction = touristService.getAttractionByName(name);
@@ -40,6 +44,7 @@ public class AttractionController {
         return "attractionNames";
     }
 
+    // Retrieves tags for a specific attraction
     @GetMapping("{name}/tags")
     public String getTag(@PathVariable("name") String name, Model model) {
         List<String> tags = touristService.getTagsByName(name);
@@ -47,6 +52,7 @@ public class AttractionController {
         return "tags";
     }
 
+    // Displays the form to add a new attraction
     @GetMapping("/add") // displays form
     public String addAttraction(Model model) {
         //adding list with tags options
@@ -64,6 +70,7 @@ public class AttractionController {
         return "addAttraction";
     }
 
+    // Saves a new attraction after the form is submitted
     @PostMapping("/save")
     public String saveAttraction(@ModelAttribute Attraction attraction, @RequestParam List<Integer> tagIds){
 
@@ -76,8 +83,8 @@ public class AttractionController {
                     return tag;
                 })
                 .toList();
-
-        touristService.addAttraction(attraction, tags);
+        //fjernet tags som parameter
+        touristService.addAttraction(attraction);
         return "redirect:/attractions";
     }
 
@@ -89,6 +96,7 @@ public class AttractionController {
     }
      */
 
+    // Deletes an attraction by name
     @PostMapping("/{name}/delete")
     public String deleteAttraction(@PathVariable("name") String name) {
         int deletedRows = touristService.deleteAttractionByName(name);
