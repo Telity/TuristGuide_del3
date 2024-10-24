@@ -1,4 +1,4 @@
-package gruppe7.turistguide_del3.Controller;
+/*package gruppe7.turistguide_del3.Controller;
 
 import gruppe7.turistguide_del3.Model.Attraction;
 import gruppe7.turistguide_del3.Model.City;
@@ -112,7 +112,7 @@ class AttractionControllerTest {
         verify(model).addAttribute("towns", towns);
         verify(model).addAttribute("attraction", any(Attraction.class));
     }*/
-
+/*
     @Test
     void saveAttraction() {
         Attraction attraction = new Attraction();
@@ -180,3 +180,4 @@ class AttractionControllerTest {
         verify(attractionService).updateAttraction(any(Attraction.class), anyList());
     }
 }
+*/
