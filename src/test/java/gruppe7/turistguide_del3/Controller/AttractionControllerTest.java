@@ -113,25 +113,6 @@ class AttractionControllerTest {
         verify(model).addAttribute("attraction", any(Attraction.class));
     }
 
-    /*
-    @Test
-    void saveAttraction() {
-        Attraction attraction = new Attraction();
-        attraction.setCityID(1);
-        List<Integer> tagIds = List.of(1,2);
-        List<Tag> tags = List.of(new Tag(), new Tag());
-
-        // Configure the mock to do nothing when addAttraction is called - for testing without dependencies
-        doNothing().when(attractionService).addAttraction(attraction, tags);
-
-        //act
-        String viewName = attractionController.saveAttraction(attraction,tagIds);
-
-        //assert
-        assertEquals("redirect:/attractions", viewName);
-        verify(attractionService).addAttraction(attraction, tags);
-    }
-     */
     @Test
     void saveAttraction() {
         Attraction attraction = new Attraction();
