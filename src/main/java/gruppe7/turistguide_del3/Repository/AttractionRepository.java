@@ -217,7 +217,6 @@ public class AttractionRepository {
         }catch(SQLException e){
             throw new RuntimeException(e);
         }
-
     }
 
     public int deleteAttraction(String name) {
