@@ -7,13 +7,13 @@ DROP TABLE IF EXISTS Attraction;
 DROP TABLE IF EXISTS Tag;
 DROP TABLE IF EXISTS City;
 
-CREATE TABLE City(
+CREATE TABLE CITY(
     city_id int auto_increment,
     city_name VARCHAR(30),
     PRIMARY KEY(city_id)
 );
 
-CREATE TABLE Attraction(
+CREATE TABLE ATTRACTION(
     attraction_id int auto_increment,
     name VARCHAR(30),
     description VARCHAR(50),
