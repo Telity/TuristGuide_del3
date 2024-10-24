@@ -10,24 +10,30 @@ import java.util.List;
 @Service
 public class    AttractionService {
 
+    // Dependency injection of the repository
     public final AttractionRepository attractionRepository;
 
+    // Constructor that injects the AttractionRepository
     public AttractionService(AttractionRepository attractionRepository) {
         this.attractionRepository = attractionRepository;
     }
 
+    // Retrieves all attractions from the repository
     public List<Attraction> getAllAttractions() {
         return attractionRepository.getAllAttractions();
     }
 
+    // Retrieves a specific attraction by name
     public Attraction getAttractionByName(String name) {
         return attractionRepository.getAttractionByName(name);
     }
 
+    // Adds a new attraction to the repository
     public void addAttraction(Attraction attraction, List<Tag> tags) {
         attractionRepository.addAttraction(attraction, tags);
     }
 
+    // Updates an existing attraction and its tags
     public Attraction updateAttraction(Attraction attraction, List<Tag> tags) {
         int updatedRows = attractionRepository.updateAttraction(attraction, tags);
 
@@ -38,23 +44,23 @@ public class    AttractionService {
         }
     }
 
+    // Deletes an attraction by name
     public int deleteAttractionByName(String name) {
        return attractionRepository.deleteAttraction(name);
     }
 
-   /* public List<Attraction> AddAttractionsList(Attraction attraction) {
-        attractionRepository.addAttraction(attraction);
-        return attractionRepository.getAllAttractions();
-    } */
-
+    // Retrieves the list of tags from the repo
     public List<Tag> getTagsList() {
         return attractionRepository.getTagsList();
     }
 
+
+    // Retrieves the list of cities from the repo
     public List<City> getTownList() {
         return attractionRepository.getTownList();
     }
 
+    //Retrieves single tag name from tagList
     public List<String> getTagsByName(String name){
         return attractionRepository.getTagsByName(name);
     }
