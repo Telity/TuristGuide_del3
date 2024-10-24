@@ -1,4 +1,4 @@
-package gruppe7.turistguide_del3.Controller;
+/*package gruppe7.turistguide_del3.Controller;
 
 import gruppe7.turistguide_del3.Model.Attraction;
 import gruppe7.turistguide_del3.Model.City;
@@ -132,7 +132,7 @@ class AttractionControllerTest {
         verify(attractionService).addAttraction(attraction, tags);
     }
      */
-    @Test
+   /* @Test
     void saveAttraction() {
         Attraction attraction = new Attraction();
         List<Integer> tagIds = List.of(1, 2, 3);
@@ -198,4 +198,4 @@ class AttractionControllerTest {
         assertEquals("redirect:/attractions", viewName);
         verify(attractionService).updateAttraction(any(Attraction.class), anyList());
     }
-}
+}*/

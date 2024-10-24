@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 @Service
-public class AttractionService {
+public class    AttractionService {
 
     public final AttractionRepository attractionRepository;
 
