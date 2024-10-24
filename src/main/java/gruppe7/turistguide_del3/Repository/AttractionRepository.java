@@ -13,6 +13,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
+
+// Database connection properties injected from application properties
 @Repository
 public class AttractionRepository {
     @Value("${spring.datasource.url}")
@@ -22,6 +24,7 @@ public class AttractionRepository {
     @Value("${spring.datasource.password}")
     private String password;
 
+    // Fetches all attractions from the database
     public List<Attraction> getAllAttractions() {
         List<Attraction> attractions = new ArrayList<>();
 
@@ -48,6 +51,7 @@ public class AttractionRepository {
         return attractions;
     }
 
+    // Fetches all available tags from the database
     public List<Tag> getTagsList() {
         List<Tag> tags = new ArrayList<>();
 
@@ -71,6 +75,7 @@ public class AttractionRepository {
         return tags;
     }
 
+    // Fetches all available cities from the database
     public List<City> getTownList() {
 
         List<City> towns = new ArrayList<>();
@@ -95,6 +100,7 @@ public class AttractionRepository {
         return towns;
     }
 
+    // Fetches a single attraction by its name
     public Attraction getAttractionByName(String name) {
 
         String query = "SELECT * FROM ATTRACTION WHERE name = ?";
@@ -123,6 +129,7 @@ public class AttractionRepository {
         return null;
     }
 
+    // Fetches the name of a city by its ID
     private String getTownByCityId(int cityId) {
 
         String town = null;
@@ -147,6 +154,7 @@ public class AttractionRepository {
 
     }
 
+    // Fetches all tags associated with an attraction by its name
     public List<String> getTagsByName(String name) {
         List<String> tags = new ArrayList<>();
 
@@ -171,7 +179,7 @@ public class AttractionRepository {
 
     }
 
-
+    // Adds a new attraction to the database
     public void addAttraction(Attraction attraction, List<Tag> tags) {
 
         String query = "INSERT INTO ATTRACTION (name, description, fee, city_id) VALUES (?, ?, ?, ?)";
@@ -219,6 +227,7 @@ public class AttractionRepository {
         }
     }
 
+    // Deletes an attraction by its name
     public int deleteAttraction(String name) {
         int updatedRows = 0;
 
@@ -238,7 +247,7 @@ public class AttractionRepository {
         return updatedRows;
     }
 
-
+    // Updates an attraction and its associated tags
     public int updateAttraction(Attraction attraction, List<Tag> tags) {
 
         int updatedRows = 0;
